@@ -76,6 +76,12 @@ class ViewControllerTests: XCTestCase {
         
         XCTAssertEqual(valueField.keyboardType, .decimalPad, "VALUE UITextField does not have a Decimal keypad set.")
     }
+    
+    func testValueField_HasDigitsOnly() throws {
+        let valueField = try XCTUnwrap(sut.valueField, "The VALUE UITextField is not connected")
+        
+        XCTAssertNotNil(Double(valueField.text ?? ""), "VALUE UITextField does not have a numeric value.")
+    }
 }
 
 
