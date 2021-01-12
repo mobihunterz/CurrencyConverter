@@ -86,7 +86,8 @@ class ConversionTableCell: UITableViewCell {
         self.originalValue = originalValue
         
         if let currency = self.currency {
-            let rate = currency.usdRate / (self.sourceCurrency?.usdRate ?? 1.0)
+            let divisor = (self.sourceCurrency?.usdRate ?? 1.0)
+            let rate = currency.usdRate / (divisor > 0 ? divisor : 1.0)
             
             let stringValue = String(format: "%.2f", self.originalValue * rate)
             let displayText = stringValue + " " + currency.code
