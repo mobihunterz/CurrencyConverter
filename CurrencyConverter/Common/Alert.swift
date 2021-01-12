@@ -7,6 +7,8 @@
 
 import UIKit
 
+// Helper Alert methods
+
 func alert(_ message: String) {
     alert(nil, message)
 }
@@ -41,32 +43,6 @@ func alert(_ title: String?,
     }
     
     alertController.view.tintColor = UIColor.blue
-    if let presented = presented {
-        presented.present(alertController, animated: true, completion: nil)
-    } else {
-        present(alertController, animated: true)
-    }
-}
-
-func alertSettings(title: String?, message: String?, presented: UIViewController?) {
-    
-    let alertController = UIAlertController(title: title,
-                                            message: message,
-                                            preferredStyle: .alert)
-    alertController.view.tintColor = UIColor.blue
-    
-    alertController.addAction(UIAlertAction(title: "Cancel",
-                                            style: .cancel,
-                                            handler: nil))
-    
-    alertController.addAction(UIAlertAction(title: "Settings",
-                                            style: .default,
-                                            handler: { (action) in
-                                                if let url = URL(string: "App-Prefs:root=Bluetooth") {
-                                                    UIApplication.shared.open(url, options: convertToUIApplicationOpenExternalURLOptionsKeyDictionary([:]), completionHandler: nil)
-                                                }
-    }))
-    
     if let presented = presented {
         presented.present(alertController, animated: true, completion: nil)
     } else {
@@ -109,6 +85,7 @@ func present(_ viewControllerToPresent: UIViewController, animated flag: Bool, c
     presentedVC()?.present(viewControllerToPresent, animated: flag, completion: completion)
 }
 
+// Get the first view controller on screen
 func presentedVC() -> UIViewController? {
     let keyWindow = UIApplication.shared.windows.filter { $0.isKeyWindow }.first
     return keyWindow?.rootViewController?.presentedViewController ?? keyWindow?.rootViewController

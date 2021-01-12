@@ -16,11 +16,24 @@ class ExchangeListViewController: UIViewController {
     static let CellReuse_ID = "EXCHANGE_CELL"
     static let Storyboard_ID = "ExchangeListController"
     
+    /**
+     Main record from RealmDB.
+     */
     var quote: CurrencyPedia?
     
+    /**
+     Selected currency from which value requires to be converted into other currencies.
+     */
     var selectedCurrency: Currency?
+    
+    /**
+     Index Path for Selected currency from which value requires to be converted into other currencies.
+     */
     var selectedIndexPath: IndexPath?
     
+    /**
+     All currencies list.
+     */
     var currencies: [Currency]? {
         get {
             if let currencies = self.quote?.currencies {
@@ -37,6 +50,8 @@ class ExchangeListViewController: UIViewController {
         didSet {
             self.tableview.delegate = self
             self.tableview.dataSource = self
+            
+            self.tableview.register(UITableViewCell.self, forCellReuseIdentifier: ExchangeListViewController.CellReuse_ID)
         }
     }
     
@@ -66,14 +81,12 @@ extension ExchangeListViewController:UITableViewDelegate, UITableViewDataSource 
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        var cell = tableView.dequeueReusableCell(withIdentifier: ExchangeListViewController.CellReuse_ID)
-        if cell == nil {
-            cell = UITableViewCell(style: .default, reuseIdentifier: ExchangeListViewController.CellReuse_ID)
-        }
+        let cell = tableView.dequeueReusableCell(withIdentifier: ExchangeListViewController.CellReuse_ID)
         
         if let currency = self.currencies?[indexPath.row] {
             cell?.textLabel?.text = currency.name
             
+            // Check if currency is already selected or not and denote with mark
             if let sCurrency = self.selectedCurrency, sCurrency.code == currency.code {
                 self.selectedIndexPath = indexPath
                 cell?.accessoryType = .checkmark
@@ -87,12 +100,14 @@ extension ExchangeListViewController:UITableViewDelegate, UITableViewDataSource 
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableview.deselectRow(at: indexPath, animated: true)
-            
+        
+        // Un-select and unmark the currency if there is any currency selected before
         if let sIndexPath = self.selectedIndexPath {
             let cell = tableview.cellForRow(at: sIndexPath)
             cell?.accessoryType = .none
         }
         
+        // Select new currency and mark it
         if let currency = self.currencies?[indexPath.row] {
             let cell = tableView.cellForRow(at: indexPath)
             cell?.accessoryType = .checkmark

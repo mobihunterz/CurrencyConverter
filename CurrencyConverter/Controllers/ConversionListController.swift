@@ -9,19 +9,48 @@ import UIKit
 
 class ConversionListController: UIViewController {
 
-    static let CellReuse_ID = "CONVERSION_CELL"
     static let Storyboard_ID = "ConversionListController"
     
+    /**
+     The value to be converted from `sourceCurrency` other currencies.
+     */
     var originalValue: Double = 0.0
+    
+    /**
+     The currency from which conversion should be performed. It would be used to calculate conversion value for the `currency`.
+     */
     var sourceCurrency: Currency?
+    
+    /**
+     List of already selected currencies.
+     */
     var selectedCurrencies: [Currency]? {
         didSet {
             self.tableview.reloadData()
         }
     }
     
+    /**
+     Ordered list of already selected currencies.
+     */
+    var orderedSelectedCurrencies: [Currency]? {
+        get {
+            if let currencies = self.selectedCurrencies {
+                return currencies.sorted { $0.name < $1.name }
+            } else {
+                return nil
+            }
+        }
+    }
+    
+    /**
+     Main record from RealmDB.
+     */
     var quote: CurrencyPedia?
     
+    /**
+     All currencies list.
+     */
     var currencies: [Currency]? {
         get {
             if let currencies = self.quote?.currencies {
@@ -69,7 +98,8 @@ class ConversionListController: UIViewController {
 extension ConversionListController:UITableViewDelegate, UITableViewDataSource {
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        if (self.selectedCurrencies?.count ?? 0) > 0 {
+        // If added any Favorite currencies, first section of favorite currencies and second for whole list
+        if (self.orderedSelectedCurrencies?.count ?? 0) > 0 {
             return 2
         } else {
             return 1
@@ -85,8 +115,8 @@ extension ConversionListController:UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if ((self.selectedCurrencies?.count ?? 0) > 0) && (section == 0) {
-            return self.selectedCurrencies?.count ?? 0
+        if ((self.orderedSelectedCurrencies?.count ?? 0) > 0) && (section == 0) {
+            return self.orderedSelectedCurrencies?.count ?? 0
         } else {
             return self.currencies?.count ?? 0
         }
@@ -97,8 +127,8 @@ extension ConversionListController:UITableViewDelegate, UITableViewDataSource {
         
         var theCurrency: Currency?
         
-        if ((self.selectedCurrencies?.count ?? 0) > 0) && (indexPath.section == 0) {
-            theCurrency = self.selectedCurrencies?[indexPath.row]
+        if ((self.orderedSelectedCurrencies?.count ?? 0) > 0) && (indexPath.section == 0) {
+            theCurrency = self.orderedSelectedCurrencies?[indexPath.row]
         } else {
             theCurrency = self.currencies?[indexPath.row]
         }

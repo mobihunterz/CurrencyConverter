@@ -9,38 +9,45 @@ import Foundation
 import RealmSwift
 import SwiftyJSON
 
+/**
+ `Currency` model from Realm.
+ 
+ Storing currency code, name and USD Rate from different APIs.
+ */
 class Currency: Object, Arrayable {
     
     @objc dynamic var code: String!
     @objc dynamic var name: String = ""
     @objc dynamic var usdRate: Double = 0.0
     
+    // Linking back to main CurrencyPrdia Quote
     var quote = LinkingObjects(fromType: CurrencyPedia.self, property: "currencies")
     
+    // JSON initializer is unused as values are assigned directly from dictionary objects and individual values are required to be assigned with different API calls
     required convenience init(_ json: JSON) {
         self.init()
-        
-        print("test")
     }
     
     override static func primaryKey() -> String? {
         return "code"
     }
-    
-    
-    func conversionValue(_ fromValue: Double = 1.0, _ sourceType: String? = "USD") -> Double {
-        return fromValue * usdRate
-    }
 }
 
 
+/**
+ `CurrencyPedia` model from Realm which is the main base model for the DB.
+ 
+ Keeps reference to `Currency` listing and `updatedTimeStamp` to measure when rate data is updated.
+ */
 class CurrencyPedia: Object {
     
     @objc dynamic var id = 0
-    
     var currencies = List<Currency>()
     @objc dynamic var updatedTimeStamp: Date = Date()
     
+    /**
+     Parses JSON data and stores them into main model - `CurrencyPedia`.
+     */
     required convenience init(_ json: JSON) {
         self.init()
         
@@ -67,6 +74,10 @@ class CurrencyPedia: Object {
         return "id"
     }
     
+    /**
+     Returns updated value from DB list.
+     Ideally, it would be `total` of `CurrencyPedia` objects + `1`
+     */
     class func getId() -> Int {
         let realm = DBManager.realm
         
@@ -79,6 +90,9 @@ class CurrencyPedia: Object {
         }
     }
     
+    /**
+     Removes all data from `Currency` and `CurrencyPedia` tables.
+     */
     func clearList() {
         DBManager.realm.delete(DBManager.realm.objects(Currency.self))
         DBManager.realm.delete(DBManager.realm.objects(CurrencyPedia.self))

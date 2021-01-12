@@ -7,10 +7,13 @@
 
 import UIKit
 
-import UIKit
-import MessageUI
 class ViewController: UIViewController {
 
+    static let Storyboard_ID = "ViewController"
+    
+    /**
+     The main textfield which takes value input which requires to be converted.
+     */
     @IBOutlet weak var valueField: UITextField! {
         didSet {
             valueField?.delegate = self
@@ -18,6 +21,9 @@ class ViewController: UIViewController {
         }
     }
     
+    /**
+     Stack control which changes Textfield and Button display layout on device orientation change.
+     */
     @IBOutlet weak var conversionFieldStack: UIStackView!
     @IBOutlet weak var exchangeButton: UIButton!
     @IBOutlet weak var conversionListView: UIView!
@@ -26,6 +32,9 @@ class ViewController: UIViewController {
     @IBOutlet weak var indicator: UIActivityIndicatorView!
     @IBOutlet weak var indicatorLabel: UILabel!
     
+    /**
+     Main record from RealmDB.
+     */
     var currentQuote: CurrencyPedia? {
         didSet {
             if self.selectedCurrency == nil {
@@ -35,13 +44,19 @@ class ViewController: UIViewController {
             }
         }
     }
+    
+    /**
+     Source currency from which value requires to be converted into other currencies.
+     */
     var selectedCurrency: Currency? {
         didSet {
             self.exchangeButton.setTitle(self.selectedCurrency?.name, for: .normal)
         }
     }
     
+    // Child control loaded into Listing view
     var conversionController : ConversionListController?
+    // Popover controller with currency list
     var exchangeListController : ExchangeListViewController?
     
     override func viewDidLoad() {
@@ -95,6 +110,7 @@ class ViewController: UIViewController {
         self.conversionController?.refreshList(self.conversionController?.originalValue ?? 1.0, self.selectedCurrency)
     }
     
+    // Adding Done toolbar for Textfield
     func addDoneButtonOnKeyboard() {
         let doneToolbar: UIToolbar = UIToolbar(frame: CGRect.init(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 50))
         doneToolbar.barStyle = .default
@@ -141,9 +157,17 @@ class ViewController: UIViewController {
         self.exchangeListController?.selectedCurrency = self.selectedCurrency
          
         if let popoverPresentationController = self.exchangeListController?.popoverPresentationController {
-            popoverPresentationController.permittedArrowDirections = .any
+            popoverPresentationController.permittedArrowDirections = .up
+            
+            if var frame = sender.superview?.convert(buttonFrame, to: self.view) {
+                frame.origin.x = frame.maxX - 1
+                frame.size.width = 1.0
+                popoverPresentationController.sourceRect = frame
+            } else {
+                popoverPresentationController.sourceRect = buttonFrame
+            }
+            
             popoverPresentationController.sourceView = self.view
-            popoverPresentationController.sourceRect = buttonFrame
             popoverPresentationController.delegate = self
             
             if let popoverController = self.exchangeListController {
@@ -154,6 +178,9 @@ class ViewController: UIViewController {
         self.tapAction()
     }
     
+    /**
+     Refresh currency related data + loading UI.
+     */
     func refreshExchange() {
         self.indicator.startAnimating()
         self.loaderView.isHidden = false
@@ -219,7 +246,7 @@ extension ViewController: UITextFieldDelegate {
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         if let sRange = Range(range, in: textField.text ?? "") {
             let newString = textField.text?.replacingCharacters(in: sRange, with: string)
-            return (newString?.count ?? 0) <= 12
+            return (newString?.count ?? 0) <= 18
         }
         
         return true
@@ -227,6 +254,9 @@ extension ViewController: UITextFieldDelegate {
 }
 
 extension ViewController: ExchangeListDelegate {
+    /**
+     When base currency is selected from which value requires to be converted into other currencies.
+     */
     func exchangeListCurrencySelected(_ currency: Currency) -> Void {
         self.selectedCurrency = currency
         self.performConversion()

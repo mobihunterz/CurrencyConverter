@@ -8,6 +8,7 @@
 import Foundation
 import SwiftyJSON
 
+// Helper method for Realm-model
 protocol Arrayable {
     init(_ json: JSON) throws
 }

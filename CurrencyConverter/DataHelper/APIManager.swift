@@ -41,16 +41,10 @@ struct APIKey {
 
 /**
  
- The Rest class makes HTTP requests to the backend server.
+ The APIManager class makes HTTP requests to the backend server using `Alamofire`.
  
  */
 class APIManager {
-    
-    static let manager: Session = {
-        let configuration = URLSessionConfiguration.default
-        configuration.urlCache = nil
-        return Session(configuration: configuration)
-    }()
     
     /**
      Fetch Currencies API call.
@@ -127,9 +121,5 @@ class APIManager {
             
         })
     }
-    
-}
-
-enum StashError: Error {
     
 }

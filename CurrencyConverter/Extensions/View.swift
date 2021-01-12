@@ -8,6 +8,7 @@
 import UIKit
 
 
+/// View extension used to load NIB resource
 extension UIView {
     
     static var xibName: String {

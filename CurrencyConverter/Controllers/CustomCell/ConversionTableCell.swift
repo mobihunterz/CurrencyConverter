@@ -8,6 +8,13 @@
 import UIKit
 
 protocol ConversionTableCellDelegate: NSObjectProtocol {
+    /**
+     Update mark for the currency.
+     
+     - Parameters:
+        - currency: Currency which is marked or unmarked.
+        - isMarked: If currency is already marked then `isMArked` would be `true` else `false`. When `isMarked == true`, currency is being processed for unmark else process for mark.
+     */
     func processCurrencyMark(_ currency: Currency?, alreadyMarked isMarked: Bool)
 }
 
@@ -26,8 +33,19 @@ class ConversionTableCell: UITableViewCell {
     
     @IBOutlet weak var markButton: UIButton!
     
+    /**
+     The currency from which conversion should be performed. It would be used to calculate conversion value for the `currency`.
+     */
     var sourceCurrency: Currency?
+    
+    /**
+     The currency which is being displayed and shows converted value using `sourceCurrency`.
+     */
     var currency: Currency?
+    
+    /**
+     The value to be converted from `sourceCurrency` to `currency`.
+     */
     var originalValue: Double = 0.0
     
     weak var delegate: ConversionTableCellDelegate?
@@ -39,12 +57,15 @@ class ConversionTableCell: UITableViewCell {
         }
     }
     
+    /**
+     List of already selected currencies.
+     */
     var selectedCurrencies: [Currency]? {
         didSet {
             if self.isMarkedCurrency {
-                markButton.setImage(UIImage(systemName: "chevron.down.circle.fill"), for: .normal)
+                markButton.setImage(UIImage(systemName: "star.fill"), for: .normal)
             } else {
-                markButton.setImage(UIImage(systemName: "chevron.up.circle"), for: .normal)
+                markButton.setImage(UIImage(systemName: "star"), for: .normal)
             }
         }
     }
@@ -52,9 +73,12 @@ class ConversionTableCell: UITableViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         
-        markButton.setImage(UIImage(systemName: "chevron.up.circle"), for: .normal)
+        markButton.setImage(UIImage(systemName: "star"), for: .normal)
     }
     
+    /**
+     Shows the currency details by calculating `originalValue` from `sourceCurrency` to `currency`.
+     */
     func display(price originalValue: Double = 0.0, for currency: Currency?, from sourceCurrency: Currency?) {
         
         self.currency = currency

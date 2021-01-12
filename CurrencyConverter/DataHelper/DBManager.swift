@@ -10,6 +10,9 @@ import RealmSwift
 import Alamofire
 import SwiftyJSON
 
+/**
+    Realm DB healper class which uses `APIManager` and updates `CurrencyPedia` model.
+ */
 class DBManager {
     static var realmConfiguration: Realm.Configuration {
         
@@ -32,6 +35,16 @@ class DBManager {
         return try! Realm(configuration: realmConfiguration)
     }
     
+    /**
+     Fetch Currency rates API call.
+     
+     - Parameters:
+        - completion: callback to be executed once fetch currency rate api call gets completed. It accepts json and error as parameters.
+     
+     Once the API call gets executed, we will get JSON response in callback and save currency rates against particular currency into DB. If there is any error, the same will be passed in callback.
+     
+     We would require separate calls to fetch list of currencies and currency rates and then merging response from both API calls into signle Table.
+     */
     static func reloadExchangeRate(completion: @escaping (_ quote: CurrencyPedia?, _ error: NSError?) -> Void) {
         
         if let firstQuote = DBManager.realm.objects(CurrencyPedia.self).first {
@@ -41,8 +54,7 @@ class DBManager {
                     guard let source = json["source"].string else {
                         print("Source Invalid..!")
                         
-                        // TODO: Some error would be there
-                        completion(firstQuote, nil)
+                        completion(firstQuote, NSError(domain: "CCParthError", code: -100, userInfo: ["message": "Invalid Source from API Response."]))
                         return
                     }
                     
@@ -50,14 +62,13 @@ class DBManager {
                         
                         try! DBManager.realm.write {
                             
+                            // Extract USD Rate only which needs to be updated into Currency list
                             let allCurrencies = firstQuote.currencies
                             for currency in allCurrencies {
                                 let rate = list[source + currency.code] as? Double
                                 currency.usdRate = rate ?? 0.0
                             }
                             
-                            //let time = json["timestamp"].doubleValue
-                            //firstQuote.updatedTimeStamp = Date(timeIntervalSince1970: time)
                             firstQuote.updatedTimeStamp = Date()
                             firstQuote.currencies = allCurrencies
                             
@@ -73,19 +84,34 @@ class DBManager {
         }
     }
     
+    /**
+     Fetch Currency list API call.
+     
+     - Parameters:
+        - completion: callback to be executed once fetch currency list api call gets completed. It accepts json and error as parameters.
+     
+      Before making any API call, threshold is being checked against `updatedTimeStamp` in `CurrencyPedia`. If call is made withing threshold time limit, simply, local listing would be returned, else actual API call would be performed.
+     
+      Once the API call gets executed, we will get JSON response in callback and save currency list into DB. If there is any error, the same will be passed in callback.
+     
+      We would require separate calls to fetch list of currencies and currency rates and then merging response from both API calls into signle Table.
+     */
     static func reloadExchangeData(completion: @escaping (_ quote: CurrencyPedia?, _ error: NSError?) -> Void) {
         
+        // Fetch premitive record - initially this would be nil
         let dataList = DBManager.realm.objects(CurrencyPedia.self)
         
         // Fetch Data and update Exchange Rates only post 30mins of Data Updates
-        let updateStamp = dataList.first?.updatedTimeStamp ?? Date().addingTimeInterval(-60*31)
-        if updateStamp.compare(Date().addingTimeInterval(-60*30)) == .orderedAscending {
+        let updateStamp = dataList.first?.updatedTimeStamp ?? Date().addingTimeInterval(-(CurrencyLayer_API_THRESHOLD + 60.0))
+        
+        if updateStamp.compare(Date().addingTimeInterval(-CurrencyLayer_API_THRESHOLD)) == .orderedAscending {
+            
             APIManager.fetchCurrencies { (json, error) in
-                
-                if let json = json, error == nil {
+                if let json = json, error == nil {      // When latest JSON data is fetched
                     let db = CurrencyPedia(json)
                     
                     if let first = dataList.first {
+                        // Confirm to update id so we can update JSON records on same CurrencyPedia object - First Object only
                         db.id = first.id
                     }
                     

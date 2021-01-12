@@ -11,7 +11,7 @@
         <!--ConversionController-->
         <scene sceneID="IhI-tx-tjO">
             <objects>
-                <viewController id="7rc-h5-rHV" userLabel="ConversionController" customClass="ViewController" customModule="CCTBackgroundTasksDemo" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="ViewController" id="7rc-h5-rHV" userLabel="ConversionController" customClass="ViewController" customModule="CurrencyConverter" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="YbO-7V-fBl">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -135,7 +135,7 @@
         <!--ExchangeList-->
         <scene sceneID="0sg-62-6ob">
             <objects>
-                <viewController storyboardIdentifier="ExchangeListController" id="jlY-cf-ffR" userLabel="ExchangeList" customClass="ExchangeListViewController" customModule="CCTBackgroundTasksDemo" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="ExchangeListController" id="jlY-cf-ffR" userLabel="ExchangeList" customClass="ExchangeListViewController" customModule="CurrencyConverter" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="DGe-dD-DNt">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -165,7 +165,7 @@
         <!--Conversion List Controller-->
         <scene sceneID="Rjq-v2-WJq">
             <objects>
-                <viewController storyboardIdentifier="ConversionListController" id="E47-oD-EdU" customClass="ConversionListController" customModule="CCTBackgroundTasksDemo" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="ConversionListController" id="E47-oD-EdU" customClass="ConversionListController" customModule="CurrencyConverter" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="Ojm-Or-iBG">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
